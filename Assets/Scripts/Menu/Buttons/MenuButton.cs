@@ -33,6 +33,7 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         SelecetButtonOff();
     }
 
+    // #. MenuButton을 상속 받은 버튼들의 실행 기능을 여기에 다 구현하는 거임
     public virtual void ImplementButton() 
     {
         SelecetButtonOff();

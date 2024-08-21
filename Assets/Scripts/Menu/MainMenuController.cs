@@ -19,6 +19,9 @@ public class MainMenuController : MonoBehaviour
     [Header("StageSelect Panel")]
     public GameObject Panel_StageSelect;
 
+    [Header("Option Panel")]
+    public GameObject Panel_Option;
+
     // #. 스테이지 관련 
     public GameObject[] Image_Stages;
     public MenuButton[] buttonsStageSelcet; // 스테이지 선택 버튼들
@@ -120,6 +123,9 @@ public class MainMenuController : MonoBehaviour
             case 1:
                 Panel = Panel_StageSelect;
                 break;
+            case 2:
+                Panel = Panel_Option;
+                break;
             default:
                 break;
         }
@@ -143,7 +149,7 @@ public class MainMenuController : MonoBehaviour
 
         // List를 배열로 변환하여 menuButtons에 할당
         menuButtons = foundButtons.ToArray();
-        lastButton = menuButtons[1];
+        lastButton = menuButtons[0];
     }
 
 

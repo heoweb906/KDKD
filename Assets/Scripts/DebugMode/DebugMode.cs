@@ -8,24 +8,24 @@ using UnityEngine.UI;
 
 public class DebugMode : MonoBehaviour
 {
-    
+
     [SerializeField] private KeyObject keyObject;
     [SerializeField] private List<KeyObject> keyObjectArr = new List<KeyObject>();
 
     [Header("스크립트 관련")]
     public KeyCapCntAssist keycapCntAssist;
     public bool bDebugMode;
-    
+
     [Header("UI Canvas 관련")]
     public Image scannerImage;
     public Camera mainCamera;
     public GameObject DebugModeImage;
     public GameObject keycapIconLayOut;
     public GameObject[] keycapIcons;
-    
+
     public int iTestNum;
 
-    
+
     // #.KeyObject 감지 함수
     public void CheckKeyObject()
     {
@@ -130,7 +130,7 @@ public class DebugMode : MonoBehaviour
                 UpdateKeyCapIcon(keyObject);
 
                 if (keyObject.keycapFuncNum.Count <= 1 && keyObjectArr.Contains(keyObject)) keyObjectArr.Remove(keyObject);
-            }  
+            }
         }
     }
     // #. Key 오브젝트에 실행할 함수를 추가하는 함수
@@ -139,12 +139,12 @@ public class DebugMode : MonoBehaviour
         if (keyObject.keycapFuncNum.Count >= 3) return; // 이미 3개 이상의 함수를 담고 있다면
         if (!(keycapCntAssist.CheckKeyCapCnt(funcNum))) return; // 만약 키를 소지하고 있지 않다면
 
-        keyObj.PlusKeyCapFunc(funcNum); 
+        keyObj.PlusKeyCapFunc(funcNum);
         keyObj.positionPlayer = transform.position;
         UpdateKeyCapIcon(keyObject);
-        if (!keyObjectArr.Contains(keyObj)) keyObjectArr.Add(keyObj); 
+        if (!keyObjectArr.Contains(keyObj)) keyObjectArr.Add(keyObj);
     }
-    
+
 
 
     public void DebugFuncStart()
@@ -163,7 +163,7 @@ public class DebugMode : MonoBehaviour
         }
     }
 
-   
+
 
     public void AddDebugFunc()
     {

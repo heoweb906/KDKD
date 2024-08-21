@@ -47,6 +47,8 @@ public class PlayerMovement : MonoBehaviour
     private int groundLayer;
     [SerializeField, Range(0, 90)]
     private int maxSlopeAngle;
+    [SerializeField]
+    private GameObject raycastOrigin;
 
     private void Start()
     {
@@ -55,10 +57,10 @@ public class PlayerMovement : MonoBehaviour
         groundLayer = ~(1 << LayerMask.NameToLayer("Player"));
     }
 
+    // 플레이어 빠르게 떨어지도록
     private void ControllGravity()
     {
-        Debug.Log(playerRigid.velocity.y);
-        if(playerRigid.velocity.y < 3)
+        if(playerRigid.velocity.y < 3 && groundList.Count == 0)
         {
             if (playerRigid.velocity.y > -maxFallingSpeed)
                 playerRigid.velocity -= new Vector3(0, fallingPower * Time.fixedDeltaTime, 0);
@@ -67,6 +69,7 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    // 플레이어 기본 이동
     private void PlayerWalk()
     {
         float _horizontal = Input.GetAxisRaw("Horizontal");
@@ -99,10 +102,11 @@ public class PlayerMovement : MonoBehaviour
         curDirection = Vector3.Lerp(preDirection, curDirection, playerMoveLerpSpeed * Time.fixedDeltaTime);
         playerAnim.SetFloat("moveSpeed", curDirection.magnitude); // 애니메이터 moveSpeed값 세팅
 
-        Vector3 velocity;
+        Vector3 velocity = CalculateNextFrameGroundAngle(playerMoveSpeed) < maxSlopeAngle ? curDirection : Vector3.zero;
         Vector3 gravity;
         
-        if (IsOnSlope())
+
+        if (IsOnSlope()) // 경사로라면 경사에 맞춰서 방향값 세팅
         {
             velocity = AdjustDirectionToSlope(curDirection);
             gravity = Vector3.zero;
@@ -110,7 +114,6 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            velocity = curDirection;
             gravity = new Vector3(0, playerRigid.velocity.y, 0);
             playerRigid.useGravity = true;
         }
@@ -120,6 +123,7 @@ public class PlayerMovement : MonoBehaviour
         preDirection = curDirection;
     }
 
+    // 현재 밟고 있는 땅 경사 체크
     private bool IsOnSlope()
     {
         Ray ray = new Ray(transform.position, Vector3.down);
@@ -132,9 +136,21 @@ public class PlayerMovement : MonoBehaviour
         return false;
     }
 
+    // 밟고 있는 땅 기준으로 방향 재설정
     private Vector3 AdjustDirectionToSlope(Vector3 direction)
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal);
+    }
+
+    private float CalculateNextFrameGroundAngle(float _moveSpeed)
+    {
+        var nextFramePlayerPosition = raycastOrigin.transform.position + curDirection * _moveSpeed * Time.fixedDeltaTime;
+
+        if(Physics.Raycast(nextFramePlayerPosition,Vector3.down,out RaycastHit hitInfo, 1f))
+        {
+            return Vector3.Angle(Vector3.up, hitInfo.normal);
+        }
+        return 0f;
     }
 
     private void PlayerJump()
@@ -234,7 +250,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!other.CompareTag("Player"))
         {
-            groundList.Remove(other.gameObject);
+            if (groundList.Contains(other.gameObject))
+                groundList.Remove(other.gameObject);
             if (groundList.Count > 0) return;
             jumpCount = 1;
             playerAnim.SetInteger("jumpCount", jumpCount);

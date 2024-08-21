@@ -28,6 +28,7 @@ public class TrainController : MonoBehaviour
         transform.DOPath(pathPoints, duration, pathType, pathMode)
                 .SetLookAt(0.01f, Vector3.forward) // 이동 방향을 향하도록 회전 (X축 기준)
                 .SetEase(Ease.Linear) // 부드러운 이동을 위한 Ease 설정
+                .SetUpdate(UpdateType.Fixed)
                 .OnComplete(MoveAlongPath); // 이동이 끝나면 다시 시작
     }
 }

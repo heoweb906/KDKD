@@ -46,7 +46,7 @@ public class StateManager : MonoBehaviour
         {
             SetState(PlayerState.Debug);
             Time.timeScale = debugTimeScale;
-            Time.fixedDeltaTime = Time.timeScale * 0.02f;
+            Time.fixedDeltaTime = Time.timeScale * 0.008333f;
             cameraController.SetCamBlendSpeed(camBlendSpeed * Time.timeScale);
             StartCoroutine(C_SetDebugCam());
             playerMovement.DeleteMoveAction();
@@ -56,7 +56,7 @@ public class StateManager : MonoBehaviour
         {
             SetState(PlayerState.Move);
             Time.timeScale = 1f;
-            Time.fixedDeltaTime = Time.timeScale * 0.02f;
+            Time.fixedDeltaTime = Time.timeScale * 0.008333f;
             cameraController.SetCamBlendSpeed(0.5f);
             playerMovement.AddMoveAction();
             StartCoroutine(C_SetMoveCam());
