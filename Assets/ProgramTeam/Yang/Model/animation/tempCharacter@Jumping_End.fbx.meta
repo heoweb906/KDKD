@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7880cda4030cfa049a1008a1a6f4206b
+guid: efd430673cfb0804197a55a2887a9f2b
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -33,11 +33,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Neutral Idle
+      name: Jumping_End
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 263
+      firstFrame: 27.8
+      lastFrame: 57
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

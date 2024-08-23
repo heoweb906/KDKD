@@ -193,10 +193,13 @@ public class PlayerMovement : MonoBehaviour
         playerRigid.velocity = dashVelocity;
         dashPosY = gameObject.transform.position.y;
 
+        playerAnim.SetBool("dash",true);
+
         yield return new WaitForSeconds(dashTime);
 
         InputManager.instance.FixedKeyaction += PlayerWalk;
         InputManager.instance.keyaction -= LockDashPositionY;
+        playerAnim.SetBool("dash", false);
         //playerRigid.velocity = new Vector3(playerRigid.velocity.x, 0, playerRigid.velocity.z);
         if (groundList.Count > 0)
             bCanDash = true;
