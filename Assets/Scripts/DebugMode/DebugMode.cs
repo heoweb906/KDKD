@@ -8,7 +8,6 @@ using UnityEngine.UI;
 
 public class DebugMode : MonoBehaviour
 {
-
     [SerializeField] private KeyObject keyObject;
     [SerializeField] private List<KeyObject> keyObjectArr = new List<KeyObject>();
 
@@ -29,44 +28,69 @@ public class DebugMode : MonoBehaviour
     // #.KeyObject 감지 함수
     public void CheckKeyObject()
     {
+        // UI 요소의 월드 좌표를 가져옵니다.
         RectTransform rt = scannerImage.GetComponent<RectTransform>();
-
         Vector3[] corners = new Vector3[4];
         rt.GetWorldCorners(corners);
 
         Vector3 bottomLeft = corners[0];
         Vector3 topRight = corners[2];
+        Rect uiRect = new Rect(bottomLeft, topRight - bottomLeft);
 
-        Rect screenRect = new Rect(bottomLeft, topRight - bottomLeft);
+        // 모든 KeyObject를 포함하여 검사할 리스트를 만듭니다.
+        List<KeyObject> allKeyObjects = new List<KeyObject>();
 
-        GameObject[] keyObjects = GameObject.FindGameObjectsWithTag("KeyObject");
+        // "KeyObject" 태그를 가진 모든 오브젝트를 찾습니다.
+        GameObject[] keyObjectRoots = GameObject.FindGameObjectsWithTag("KeyObject");
+
+        foreach (GameObject root in keyObjectRoots)
+        {
+            // 각 루트 오브젝트에서 KeyObject 컴포넌트를 찾습니다.
+            KeyObject rootKeyObject = root.GetComponent<KeyObject>();
+            if (rootKeyObject != null)
+            {
+                allKeyObjects.Add(rootKeyObject);
+            }
+
+            // 루트 오브젝트의 자식 오브젝트도 검사합니다.
+            foreach (Transform child in root.transform)
+            {
+                KeyObject childKeyObject = child.GetComponent<KeyObject>();
+                if (childKeyObject != null)
+                {
+                    allKeyObjects.Add(childKeyObject);
+                }
+            }
+        }
 
         KeyObject newClosestKeyObject = null;
         float closestDistance = float.MaxValue;
 
-        foreach (GameObject obj in keyObjects)
+        foreach (KeyObject objKeyObject in allKeyObjects)
         {
-            KeyObject objKeyObject = obj.GetComponent<KeyObject>();
             if (objKeyObject != null)
             {
-                Vector3 screenPos = mainCamera.WorldToScreenPoint(obj.transform.position);
+                Collider objCollider = objKeyObject.GetComponent<Collider>();
 
-                if (screenRect.Contains(screenPos))
+                if (objCollider != null)
                 {
-                    // 이미지 안에 있는 KeyObject 찾기
-                    float distanceToCenter = Vector3.Distance(screenPos, rt.position);
-
-                    if (distanceToCenter < closestDistance)
+                    // Collider의 경계와 UI 요소의 Rect가 겹치는지 확인합니다.
+                    if (IsColliderIntersectingWithRect(objCollider, uiRect))
                     {
-                        closestDistance = distanceToCenter;
-                        newClosestKeyObject = objKeyObject;
+                        Vector3 screenPos = mainCamera.WorldToScreenPoint(objKeyObject.transform.position);
+                        float distanceToCenter = Vector3.Distance(screenPos, rt.position);
+
+                        if (distanceToCenter < closestDistance)
+                        {
+                            closestDistance = distanceToCenter;
+                            newClosestKeyObject = objKeyObject;
+                        }
                     }
-                }
-                else
-                {
-                    // 이미지 밖에 있는 KeyObject는 상호작용 끄기
-                    objKeyObject.Off_Interaction();
-                    UpdateKeyCapIcon(keyObject);
+                    else
+                    {
+                        // UI 영역 밖에 있는 KeyObject는 상호작용 끄기
+                        objKeyObject.Off_Interaction();
+                    }
                 }
             }
         }
@@ -90,13 +114,48 @@ public class DebugMode : MonoBehaviour
             }
         }
 
-        // 이미지 밖에 있는 경우 모든 상호작용 끄기
-        if (keyObject != null && !screenRect.Contains(mainCamera.WorldToScreenPoint(keyObject.transform.position)))
+        // UI 영역 밖에 있는 경우 모든 상호작용 끄기
+        if (keyObject != null && !IsColliderIntersectingWithRect(keyObject.GetComponent<Collider>(), uiRect))
         {
             keyObject.Off_Interaction();
             keyObject = null;  // closestKeyObject 초기화
             UpdateKeyCapIcon(keyObject);
         }
+    }
+
+    private bool IsColliderIntersectingWithRect(Collider collider, Rect rect)
+    {
+        // Collider의 Bounds를 가져옵니다.
+        Bounds bounds = collider.bounds;
+
+        // Bounds의 8개 꼭짓점을 UI 요소의 화면 좌표로 변환합니다.
+        Vector3[] colliderCorners = new Vector3[8];
+        colliderCorners[0] = mainCamera.WorldToScreenPoint(new Vector3(bounds.min.x, bounds.min.y, bounds.min.z));
+        colliderCorners[1] = mainCamera.WorldToScreenPoint(new Vector3(bounds.min.x, bounds.min.y, bounds.max.z));
+        colliderCorners[2] = mainCamera.WorldToScreenPoint(new Vector3(bounds.min.x, bounds.max.y, bounds.min.z));
+        colliderCorners[3] = mainCamera.WorldToScreenPoint(new Vector3(bounds.min.x, bounds.max.y, bounds.max.z));
+        colliderCorners[4] = mainCamera.WorldToScreenPoint(new Vector3(bounds.max.x, bounds.min.y, bounds.min.z));
+        colliderCorners[5] = mainCamera.WorldToScreenPoint(new Vector3(bounds.max.x, bounds.min.y, bounds.max.z));
+        colliderCorners[6] = mainCamera.WorldToScreenPoint(new Vector3(bounds.max.x, bounds.max.y, bounds.min.z));
+        colliderCorners[7] = mainCamera.WorldToScreenPoint(new Vector3(bounds.max.x, bounds.max.y, bounds.max.z));
+
+        // Rect와 Bounding Box의 교차 여부를 검사합니다.
+        foreach (Vector3 corner in colliderCorners)
+        {
+            if (rect.Contains(corner))
+            {
+                return true;
+            }
+        }
+
+        // Collider의 중심점이 Rect에 포함되는지 확인합니다.
+        Vector3 colliderCenter = mainCamera.WorldToScreenPoint(bounds.center);
+        if (rect.Contains(colliderCenter))
+        {
+            return true;
+        }
+
+        return false;
     }
     public void CheckKeyObjectOff()
     {
@@ -138,6 +197,18 @@ public class DebugMode : MonoBehaviour
     {
         if (keyObject.keycapFuncNum.Count >= 3) return; // 이미 3개 이상의 함수를 담고 있다면
         if (!(keycapCntAssist.CheckKeyCapCnt(funcNum))) return; // 만약 키를 소지하고 있지 않다면
+
+        switch (funcNum)
+        {
+            case 0:
+            case 1:
+                if (!keyObject.bCanSizeControl) return;
+                break;
+            case 2: 
+                if (!keyObject.bCanGrab) return;
+                break;
+
+        } 
 
         keyObj.PlusKeyCapFunc(funcNum);
         keyObj.positionPlayer = transform.position;
