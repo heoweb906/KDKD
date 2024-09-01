@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3810739006489203592}
   - component: {fileID: 324844340196822543}
   - component: {fileID: 8631166249157975387}
+  - component: {fileID: -7399946072554516034}
   m_Layer: 0
   m_Name: woodblock_01_low
   m_TagString: Untagged
@@ -83,3 +84,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &-7399946072554516034
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4718939763872648845}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.925, y: 4.925001, z: 4.9250016}
+  m_Center: {x: 0, y: 0, z: 2.500001}
