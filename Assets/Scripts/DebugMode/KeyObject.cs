@@ -42,8 +42,10 @@ public class KeyObject : MonoBehaviour
     public bool bIsSpring;
     public float bounceForce = 10f;
 
-
+    
     private Rigidbody rb;
+
+   
 
 
     private void Awake()
@@ -176,29 +178,32 @@ public class KeyObject : MonoBehaviour
 
     #region // 상호작용 함수들
     // #. "+" 버튼 - 커지기
-    public void KeyCapFunc_Bigger()
+    virtual public void KeyCapFunc_Bigger()
     {
         Debug.Log("커지기");
         gameObject.transform.DOScale(gameObject.transform.localScale * 2f, 0.15f).SetEase(Ease.InOutBack);
+
+        iCntSizeControl++;
 
         InteractionEffectupdate();
     }
 
 
     // #. "-" 버튼 - 작아지기
-    public void KeyCapFunc_Smaller()
+    virtual public void KeyCapFunc_Smaller()
     {
         Debug.Log("작아지기");
         gameObject.transform.DOScale(gameObject.transform.localScale * 0.5f, 0.15f).SetEase(Ease.InOutBack);
 
-        InteractionEffectupdate();
+        iCntSizeControl--;
 
+        InteractionEffectupdate();
     }
 
-  
+
 
     // #. "J" 버튼 - 당기기
-    public void KeyCapFunc_Grap()
+    virtual public void KeyCapFunc_Grap()
     {
         Debug.Log("당기기");
 
